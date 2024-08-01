@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CALCULADORA DO PORTE - PF</title>
+<link rel="icon" type="image/x-icon" href="https://seeklogo.com/images/P/Policia_Federal-logo-D44CFC997F-seeklogo.com.png">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+  .center {
+    text-align: center;
+  }
+  fieldset {
+    margin-bottom: 20px;
+  }
+  .arma {
+    margin-bottom: 15px;
+  }
+  .arma strong {
+    display: inline-block;
+    margin-bottom: 5px;
+  }
+  textarea {
+    margin-top: 20px;
+  }
+  button {
+    display: block;
+    margin-top: 20px;
+  }
+</style>
+<script>
+function calcularTotal() {
+  var grupo = parseInt(document.getElementById('grupo').value);
+  var parceria = document.getElementById('parceria').value;
+  var totalArmas = 0;
+  var totalMunicoes = 0;
+  var custoTotalArmas = 0;
+
+  // Preços das armas por grupo
+  var precosVenda = {
+    "HK": [300000, 250000, 225000, 200000, 175000],
+    "Glock": [720000, 600000, 540000, 480000, 420000],
+    "MP5": [0, 1000000, 900000, 800000, 700000],
+    "Escorpion": [0, 0, 1080000, 960000, 840000],
+    "NSR": [0, 0, 0, 1280000, 1120000],
+    "M4A4": [0, 0, 0, 0, 2520000]
+  };
+
+  // Custos de produção das armas por grupo
+  var custosProducao = {
+    "HK": [87500, 62500, 50000, 37500, 25000],
+    "Glock": [210000, 150000, 120000, 90000, 60000],
+    "MP5": [0, 250000, 200000, 150000, 100000],
+    "Escorpion": [0, 0, 240000, 180000, 120000],
+    "NSR": [0, 0, 0, 240000, 160000],
+    "M4A4": [0, 0, 0, 0, 360000]
+  };
+
+  if (parceria === "Hospital") {
+    precosVenda = {
+      "HK": [240000, 240000, 240000, 0, 0],
+      "Glock": [570000, 570000, 570000, 0, 0],
+      "MP5": [0, 960000, 960000, 0, 0],
+      "Escorpion": [0, 1150000, 1150000, 0, 0],
+      "NSR": [0, 0, 1540000, 0, 0],
+      "M4A4": [0, 0, 0, 0, 0]
+    };
+    custosProducao = {
+      "HK": [57500, 57500, 57500, 0, 0],
+      "Glock": [135000, 135000, 135000, 0, 0],
+      "MP5": [0, 230000, 230000, 0, 0],
+      "Escorpion": [0, 275000, 275000, 0, 0],
+      "NSR": [0, 0, 370000, 0, 0],
+      "M4A4": [0, 0, 0, 0, 0]
+    };
+  } else if (parceria === "Bombeiros") {
+    precosVenda = {
+      "HK": [240000, 240000, 240000, 240000, 0],
+      "Glock": [570000, 570000, 570000, 570000, 0],
+      "MP5": [0, 960000, 960000, 960000, 0],
+      "Escorpion": [0, 0, 1150000, 1150000, 0],
+      "NSR": [0, 0, 0, 1540000, 0],
+      "M4A4": [0, 0, 0, 0, 0]
+    };
+    custosProducao = {
+      "HK": [57500, 57500, 57500, 57500, 0],
+      "Glock": [135000, 135000, 135000, 135000, 0],
+      "MP5": [0, 230000, 230000, 230000, 0],
+      "Escorpion": [0, 0, 275000, 275000, 0],
+      "NSR": [0, 0, 0, 370000, 0],
+      "M4A4": [0, 0, 0, 0, 0]
+    };
+  }
+
+  // Preços das munições por arma
+  var precosMunicao = {
+    "HK": 1000,
+    "Glock": 1400,
+    "MP5": 2000,
+    "Escorpion": 2500,
+    "NSR": 3500,
+    "M4A4": 4000
+  };
+
+  // Calcular o custo total de produção das armas
+  var armas = document.querySelectorAll('.arma');
+  armas.forEach(function(arma) {
+    var nomeArma = arma.querySelector('.nome_arma').textContent;
+    var quantidade = parseInt(arma.querySelector('.quantidade').value) || 0;
+
+    custoTotalArmas += custosProducao[nomeArma][grupo - 1] * quantidade;
+    totalArmas += precosVenda[nomeArma][grupo - 1] * quantidade; // Preço da arma
+  });
+
+  // Calcular o total das munições para cada arma selecionada
+  var camposMunicao = document.querySelectorAll('.municao');
+  camposMunicao.forEach(function(campo) {
+    var nomeArma = campo.getAttribute('data-arma'); 
+    var quantidade = parseInt(campo.value) || 0;
+    totalMunicoes += precosMunicao[nomeArma] * quantidade; //Preço das Munições
+  });
+
+  // Atualizar o valor total da venda e o custo total das armas no campo correspondente
+  var totalVenda = totalArmas;
+  var somaFinal = totalVenda + totalMunicoes;
+  document.getElementById('total').textContent = "Total das Armas: $" + totalVenda.toLocaleString('pt-BR');
+  document.getElementById('custo_armas').textContent = "Valor a ser repassado para o tesoureiro: $" + custoTotalArmas.toLocaleString('pt-BR');
+  document.getElementById('total_municoes').textContent = "Total das Munições: $" + totalMunicoes.toLocaleString('pt-BR');
+  document.getElementById('soma_final').textContent = "Valor a ser recebido: $" + somaFinal.toLocaleString('pt-BR');
+}
+
+function limparCampos() {
+  document.getElementById("grupo").value = "";
+  document.getElementById("parceria").value = "Nenhuma";
+  var camposQuantidade = document.querySelectorAll('.quantidade');
+  camposQuantidade.forEach(function(campo) {
+    campo.value = "";
+  });
+  var camposMunicao = document.querySelectorAll('.municao');
+  camposMunicao.forEach(function(campo) {
+    campo.value = "";
+  });
+  document.getElementById('total').textContent = "Total das Armas: $0";
+  document.getElementById('custo_armas').textContent = "Valor a ser repassado para o tesoureiro: $0";
+  document.getElementById('total_municoes').textContent = "Total das Munições: $0";
+  document.getElementById('soma_final').textContent = "Valor a ser recebido: $0";
+}
+</script>
+</head>
+<body>
+  <div class="center">
+    <img src="https://seeklogo.com/images/P/Policia_Federal-logo-D44CFC997F-seeklogo.com.png" width="15" height="15">
+    <strong><font color="#00000">CALCULADORA DE VENDA DE ARMAS DO PORTE - PF</font></strong>
+    <img src="https://seeklogo.com/images/P/Policia_Federal-logo-D44CFC997F-seeklogo.com.png" width="15" height="15">
+  </div>
+
+  <form>
+    <label for="parceria">Parceria: </label>
+    <select id="parceria" name="parceria" onchange="calcularTotal()">
+      <option value="Nenhuma">Nenhuma</option>
+      <option value="Hospital">Hospital</option>
+      <option value="Bombeiros">Bombeiros</option>
+    </select><br><br>
+    
+    <label for="grupo">Grupo do Comprador: </label>
+    <input type="number" id="grupo" name="grupo" min="1" max="5" onchange="calcularTotal()"><br><br>
+
+    <fieldset>
+      <legend><strong>Armas e Munições</strong></legend>
+      <div class="arma">
+        <span class="nome_arma"><strong>HK</strong></span><br>
+        Quantidade:
+        <input type="number" class="quantidade" name="quantidade_hk" min="0" max="3" onchange="calcularTotal()">
+        Quantidade de Munições:
+        <input type="number" class="municao" name="municao_hk" data-arma="HK" placeholder="Quantidade de Munições" min="0" onchange="calcularTotal()">
+      </div>
+      <div class="arma">
+        <span class="nome_arma"><strong>Glock</strong></span><br>
+        Quantidade:
+        <input type="number" class="quantidade" name="quantidade_glock" min="0" max="3" onchange="calcularTotal()">
+        Quantidade de Munições:
+        <input type="number" class="municao" name="municao_glock" data-arma="Glock" placeholder="Quantidade de Munições" min="0" onchange="calcularTotal()">
+      </div>
+      <div class="arma">
+        <span class="nome_arma"><strong>MP5</strong></span><br>
+        Quantidade:
+        <input type="number" class="quantidade" name="quantidade_mp5" min="0" max="3" onchange="calcularTotal()">
+        Quantidade de Munições:
+        <input type="number" class="municao" name="municao_mp5" data-arma="MP5" placeholder="Quantidade de Munições" min="0" onchange="calcularTotal()">
+      </div>
+      <div class="arma">
+        <span class="nome_arma"><strong>Escorpion</strong></span><br>
+        Quantidade:
+        <input type="number" class="quantidade" name="quantidade_escorpion" min="0" max="3" onchange="calcularTotal()">
+        Quantidade de Munições:
+        <input type="number" class="municao" name="municao_escorpion" data-arma="Escorpion" placeholder="Quantidade de Munições" min="0" onchange="calcularTotal()">
+      </div>
+      <div class="arma">
+        <span class="nome_arma"><strong>NSR</strong></span><br>
+        Quantidade:
+        <input type="number" class="quantidade" name="quantidade_nsr" min="0" max="3" onchange="calcularTotal()">
+        Quantidade de Munições:
+        <input type="number" class="municao" name="municao_nsr" data-arma="NSR" placeholder="Quantidade de Munições" min="0" onchange="calcularTotal()">
+      </div>
+      <div class="arma">
+        <span class="nome_arma"><strong>M4A4</strong></span><br>
+        Quantidade:
+        <input type="number" class="quantidade" name="quantidade_m4a4" min="0" max="3" onchange="calcularTotal()">
+        Quantidade de Munições:
+        <input type="number" class="municao" name="municao_m4a4" data-arma="M4A4" placeholder="Quantidade de Munições" min="0" onchange="calcularTotal()">
+      </div>
+    </fieldset>
+  </form>
+  
+  <p id="total">Total das Armas: $0</p>
+  <p id="custo_armas">Valor a ser repassado para o tesoureiro: $0</p>
+  <p id="total_municoes">Total das Munições: $0</p>
+  <p id="soma_final">Valor a ser recebido: $0</p>
+
+  <button type="button" onclick="limparCampos()">Limpar Campos</button>
+</body>
+</html>
